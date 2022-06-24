@@ -190,6 +190,12 @@ pub const Options = struct {
     /// (Darwin) size of the __PAGEZERO segment
     pagezero_size: ?u64 = null,
 
+    /// (Darwin) set minimum space for future expansion of the load commands
+    headerpad_size: ?u64 = null,
+
+    /// (Darwin) set enough space as if all paths were MATPATHLEN
+    headerpad_max_install_names: bool = false,
+
     pub fn effectiveOutputMode(options: Options) std.builtin.OutputMode {
         return if (options.use_lld) .Obj else options.output_mode;
     }

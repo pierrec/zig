@@ -1586,6 +1586,14 @@ pub const LibExeObjStep = struct {
     /// (Darwin) Size of the pagezero segment.
     pagezero_size: ?u64 = null,
 
+    /// (Darwin) Set size of the padding between the end of load commands
+    /// and start of `__TEXT,__text` section.
+    headerpad_size: ?u64 = null,
+
+    /// (Darwin) Automatically Set size of the padding between the end of load commands
+    /// and start of `__TEXT,__text` section to a value fitting all paths expanded to MAXPATHLEN.
+    headerpad_max_install_names: bool = false,
+
     /// Position Independent Code
     force_pic: ?bool = null,
 
@@ -2649,6 +2657,13 @@ pub const LibExeObjStep = struct {
         if (self.pagezero_size) |pagezero_size| {
             const size = try std.fmt.allocPrint(builder.allocator, "{x}", .{pagezero_size});
             try zig_args.appendSlice(&[_][]const u8{ "-pagezero_size", size });
+        }
+        if (self.headerpad_size) |headerpad_size| {
+            const size = try std.fmt.allocPrint(builder.allocator, "{x}", .{headerpad_size});
+            try zig_args.appendSlice(&[_][]const u8{ "-headerpad_size", size });
+        }
+        if (self.headerpad_max_install_names) {
+            try zig_args.append("-headerpad_max_install_names");
         }
 
         if (self.bundle_compiler_rt) |x| {

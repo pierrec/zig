@@ -905,6 +905,10 @@ pub const InitOptions = struct {
     entitlements: ?[]const u8 = null,
     /// (Darwin) size of the __PAGEZERO segment
     pagezero_size: ?u64 = null,
+    /// (Darwin) set minimum space for future expansion of the load commands
+    headerpad_size: ?u64 = null,
+    /// (Darwin) set enough space as if all paths were MATPATHLEN
+    headerpad_max_install_names: bool = false,
 };
 
 fn addPackageTableToCacheHash(
@@ -1745,6 +1749,8 @@ pub fn create(gpa: Allocator, options: InitOptions) !*Compilation {
             .install_name = options.install_name,
             .entitlements = options.entitlements,
             .pagezero_size = options.pagezero_size,
+            .headerpad_size = options.headerpad_size,
+            .headerpad_max_install_names = options.headerpad_max_install_names,
         });
         errdefer bin_file.destroy();
         comp.* = .{
