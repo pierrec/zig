@@ -448,7 +448,7 @@ const usage_build_generic =
     \\  -install_name=[value]          (Darwin) add dylib's install name
     \\  --entitlements [path]          (Darwin) add path to entitlements file for embedding in code signature
     \\  -pagezero_size [value]         (Darwin) size of the __PAGEZERO segment in hexadecimal notation
-    \\  -headerpad_size [value]        (Darwin) set minimum space for future expansion of the load commands in hexadecimal notation
+    \\  -headerpad [value]             (Darwin) set minimum space for future expansion of the load commands in hexadecimal notation
     \\  -headerpad_max_install_names   (Darwin) set enough space as if all paths were MAXPATHLEN
     \\  --import-memory                (WebAssembly) import memory from the environment
     \\  --import-table                 (WebAssembly) import function table from the host environment
@@ -698,7 +698,7 @@ fn buildOutputType(
     var hash_style: link.HashStyle = .both;
     var entitlements: ?[]const u8 = null;
     var pagezero_size: ?u64 = null;
-    var headerpad_size: ?u64 = null;
+    var headerpad_size: ?u32 = null;
     var headerpad_max_install_names: bool = false;
 
     // e.g. -m3dnow or -mno-outline-atomics. They correspond to std.Target llvm cpu feature names.
@@ -921,11 +921,11 @@ fn buildOutputType(
                         pagezero_size = std.fmt.parseUnsigned(u64, eatIntPrefix(next_arg, 16), 16) catch |err| {
                             fatal("unable to parse '{s}': {s}", .{ arg, @errorName(err) });
                         };
-                    } else if (mem.eql(u8, arg, "-headerpad_size")) {
+                    } else if (mem.eql(u8, arg, "-headerpad")) {
                         const next_arg = args_iter.next() orelse {
                             fatal("expected parameter after {s}", .{arg});
                         };
-                        headerpad_size = std.fmt.parseUnsigned(u64, eatIntPrefix(next_arg, 16), 16) catch |err| {
+                        headerpad_size = std.fmt.parseUnsigned(u32, eatIntPrefix(next_arg, 16), 16) catch |err| {
                             fatal("unable to parser '{s}': {s}", .{ arg, @errorName(err) });
                         };
                     } else if (mem.eql(u8, arg, "-headerpad_max_install_names")) {
@@ -1678,13 +1678,13 @@ fn buildOutputType(
                     pagezero_size = std.fmt.parseUnsigned(u64, eatIntPrefix(next_arg, 16), 16) catch |err| {
                         fatal("unable to parse '{s}': {s}", .{ arg, @errorName(err) });
                     };
-                } else if (mem.eql(u8, arg, "-headerpad_size")) {
+                } else if (mem.eql(u8, arg, "-headerpad")) {
                     i += 1;
                     if (i >= linker_args.items.len) {
                         fatal("expected linker arg after '{s}'", .{arg});
                     }
                     const next_arg = linker_args.items[i];
-                    headerpad_size = std.fmt.parseUnsigned(u64, eatIntPrefix(next_arg, 16), 16) catch |err| {
+                    headerpad_size = std.fmt.parseUnsigned(u32, eatIntPrefix(next_arg, 16), 16) catch |err| {
                         fatal("unable to parse '{s}': {s}", .{ arg, @errorName(err) });
                     };
                 } else if (mem.eql(u8, arg, "-headerpad_max_install_names")) {
